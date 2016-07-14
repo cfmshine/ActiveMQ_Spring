@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	
+	<!-- 配置Active中的连接池工厂   -->
+	<bean id="pooledConnectionFactory" class="org.apache.activemq.pool.PooledConnectionFactory">
+		<property name="connectionFactory">
+			<!-- 配置Active中的连接工厂 -->
+			<bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+				<property name="brokerURL" value="tcp://localhost:61616"/>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+		<property name="connectionFactory" ref="pooledConnectionFactory"/>
+		<property name="defaultDestination" ref="destination"/>
+	</bean>
+	
+	<bean id="destination" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg index="0" value="ActiveQueue"/>
+	</bean>
+	
+	<bean id="sender" class="com.cfm.activemq.Sender">
+		<property name="jmsTemplate" ref="jmsTemplate"/>
+	</bean>
+	
+	<bean id="receiver" class="com.cfm.activemq.Receiver">
+		<property name="jmsTemplate" ref="jmsTemplate"/>
+	</bean>
+
+</beans>
+
